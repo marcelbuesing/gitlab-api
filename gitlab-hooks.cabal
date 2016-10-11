@@ -15,9 +15,10 @@ build-type:          Simple
 extra-source-files:  ChangeLog.md
 cabal-version:       >=1.10
 
-executable gitlab-hooks
-  main-is:             Main.hs
-  -- other-modules:
+library
+  exposed-modules:     GitlabHooks
+                     , GitlabHooks.Data
+                     , GitlabHooks.Data.Types
   -- other-extensions:
   build-depends:       aeson >= 0.11
                      , base >=4.9 && <4.10

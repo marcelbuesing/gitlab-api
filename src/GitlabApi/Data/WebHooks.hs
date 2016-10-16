@@ -1,6 +1,26 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GitlabApi.Data.WebHooks where
+module GitlabApi.Data.WebHooks (
+    Assignee(..)
+  , Build(..)
+  , BuildArtifactsFile(..)
+  , BuildRunner(..)
+  , BuildStage(..)
+  , BuildStatus(..)
+  , GitlabEvent(..)
+  , IssueEventObjectAttribute(..)
+  , IssueEventRepository(..)
+  , ObjectAttributeAction(..)
+  , ObjectAttributeRef(..)
+  , ObjectAttributeState(..)
+  , PipelineEventCommit(..)
+  , PipelineEventObjectAttribute(..)
+  , PipelineEventProject(..)
+  , PipelineEventStage(..)
+  , PipelineEventStatus(..)
+  , SHA(..)
+  , User(..)
+ ) where
 
 import qualified Data.ByteString.Char8 as B
 import Data.Aeson
@@ -14,21 +34,21 @@ import Text.Email.Validate (EmailAddress, emailAddress)
 import GitlabApi.Data.ApiTypes
 
 data GitlabEvent =
-  PushEvent
-  { _pushEventObjectKind :: Text
-  , _pushEventBefore :: CommitRef
-  , _pushEventAfter :: CommitRef
-  , _pushEventRef :: Text
-  , _pushEventCheckoutSha :: Text
-  , _pushEventUserId :: UserId
-  , _pushEventUserName :: Text
-  , _pushEventUserEmail :: EmailAddress
-  , _pushEventUserAvatar:: Text
-  , _pushEventProjectId :: ProjectId
-  , _pushEventTotalCommitsCount :: Int
-  , _pushEventProject :: Project
-  , _pushEventCommits :: [Commit]
-  , _pushEventRepository :: PushEventRepository
+  WHPushEvent
+  { _whPushEventObjectKind :: Text
+  , _whPushEventBefore :: CommitRef
+  , _whPushEventAfter :: CommitRef
+  , _whPushEventRef :: Text
+  , _whPushEventCheckoutSha :: Text
+  , _whPushEventUserId :: UserId
+  , _whPushEventUserName :: Text
+  , _whPushEventUserEmail :: EmailAddress
+  , _whPushEventUserAvatar:: Text
+  , _whPushEventProjectId :: ProjectId
+  , _whPushEventTotalCommitsCount :: Int
+  , _whPushEventProject :: Project
+  , _whPushEventCommits :: [Commit]
+  , _whPushEventRepository :: PushEventRepository
   }
   | IssueEvent
   { _issueEventObjectKind :: Text
@@ -55,7 +75,7 @@ instance FromJSON GitlabEvent where
     _ -> fail "unexpected event"
 
 parsePushEvent :: Object -> Parser GitlabEvent
-parsePushEvent v = PushEvent <$>
+parsePushEvent v = WHPushEvent <$>
     v .: "object_kind" <*>
     v .: "before" <*>
     v .: "after" <*>

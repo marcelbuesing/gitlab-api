@@ -1,6 +1,8 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GitlabApi.Data.SystemHooks where
+module GitlabApi.Data.SystemHooks (
+    SystemHook(..)
+  ) where
 
 import Data.Aeson
 import Data.Aeson.Types (Parser, typeMismatch)
@@ -79,20 +81,20 @@ data SystemHook =
   , _userRemovedUserName :: Username
   , _userRemovedUserId :: UserId
   } |
-  PushEvent
-  { _pushEventBefore :: CommitRef
-  , _pushEventAfter :: CommitRef
-  , _pushEventRef :: Text
-  , _pushEventCheckoutSha :: Text
-  , _pushEventUserId :: Int
-  , _pushEventUserName :: Username
-  , _pushEventUserEmail :: EmailAddress
-  , _pushEventUserAvatar:: Text
-  , _pushEventProjectId :: ProjectId
-  , _pushEventTotalCommitsCount :: Int
-  , _pushEventProject :: Project
-  , _pushEventCommits :: [Commit]
-  , _pushEventRepository :: PushEventRepository
+  SHPushEvent
+  { _shPushEventBefore :: CommitRef
+  , _shPushEventAfter :: CommitRef
+  , _shPushEventRef :: Text
+  , _shPushEventCheckoutSha :: Text
+  , _shPushEventUserId :: Int
+  , _shPushEventUserName :: Username
+  , _shPushEventUserEmail :: EmailAddress
+  , _shPushEventUserAvatar:: Text
+  , _shPushEventProjectId :: ProjectId
+  , _shPushEventTotalCommitsCount :: Int
+  , _shPushEventProject :: Project
+  , _shPushEventCommits :: [Commit]
+  , _shPushEventRepository :: PushEventRepository
   }
 
 instance FromJSON SystemHook where
@@ -181,7 +183,7 @@ parseUserDestroyed v = UserRemoved <$>
   v .: "user_id"
 
 parsePushEvent :: Object -> Parser SystemHook
-parsePushEvent v = PushEvent <$>
+parsePushEvent v = SHPushEvent <$>
     v .: "before" <*>
     v .: "after" <*>
     v .: "ref" <*>

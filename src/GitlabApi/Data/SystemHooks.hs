@@ -1,5 +1,10 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module GitlabApi.Data.SystemHooks where
 
+import Data.Aeson
+import Data.Aeson.Types (Parser, typeMismatch)
+import qualified Data.HashMap.Lazy as HML
 import Data.Text as T
 import Text.Email.Validate (EmailAddress, emailAddress)
 
@@ -61,7 +66,8 @@ data SystemHook =
   , _userCreatedUpdatedAtEvent :: GitlabDate
   , _userCreatedEmail :: EmailAddress
   , _userCreatedEventName :: Text
-  , _userCreatedName ::  Username
+  , _userCreatedName :: Name
+  , _userCreatedUserName :: Username
   , _userCreatedUserId :: UserId
   } |
   UserRemoved
@@ -69,7 +75,8 @@ data SystemHook =
   , _userRemovedUpdatedAtEvent :: GitlabDate
   , _userRemovedEmail :: EmailAddress
   , _userRemovedEventName :: Text
-  , _userRemovedName ::  Username
+  , _userRemovedName :: Name
+  , _userRemovedUserName :: Username
   , _userRemovedUserId :: UserId
   } |
   PushEvent
@@ -78,7 +85,7 @@ data SystemHook =
   , _pushEventRef :: Text
   , _pushEventCheckoutSha :: Text
   , _pushEventUserId :: Int
-  , _pushEventUserName :: Text
+  , _pushEventUserName :: Username
   , _pushEventUserEmail :: EmailAddress
   , _pushEventUserAvatar:: Text
   , _pushEventProjectId :: ProjectId
@@ -87,3 +94,104 @@ data SystemHook =
   , _pushEventCommits :: [Commit]
   , _pushEventRepository :: PushEventRepository
   }
+
+instance FromJSON SystemHook where
+  parseJSON (Object v) = case HML.lookup "event_name" v of
+    Just (String "project_create") -> parseProjectCreated v
+    Just (String "project_destroy") -> parseProjectDestroyed v
+    Just (String "project_rename") -> parseProjectRenamed v
+    Just (String "project_transfer") -> parseProjectTransferred v
+    Just (String "user_create") -> parseUserCreated v
+    Just (String "user_destroy") -> parseUserDestroyed v
+    Just (String "push") -> parsePushEvent v
+    _ -> fail "unexpected event"
+
+parseProjectCreated :: Object -> Parser SystemHook
+parseProjectCreated v = ProjectCreated <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "owner_email" <*>
+  v .: "owner_name" <*>
+  v .: "path" <*>
+  v .: "path_with_namespace" <*>
+  v .: "project_id" <*>
+  v .: "project_visibility"
+
+parseProjectDestroyed :: Object -> Parser SystemHook
+parseProjectDestroyed v = ProjectDestroyed <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "owner_email" <*>
+  v .: "owner_name" <*>
+  v .: "path" <*>
+  v .: "path_with_namespace" <*>
+  v .: "project_id" <*>
+  v .: "project_visibility"
+
+parseProjectRenamed :: Object -> Parser SystemHook
+parseProjectRenamed v = ProjectRenamed <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "owner_email" <*>
+  v .: "owner_name" <*>
+  v .: "path" <*>
+  v .: "path_with_namespace" <*>
+  v .: "old_path_with_namespace" <*>
+  v .: "project_id" <*>
+  v .: "project_visibility"
+
+parseProjectTransferred :: Object -> Parser SystemHook
+parseProjectTransferred v = ProjectTransferred <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "owner_email" <*>
+  v .: "owner_name" <*>
+  v .: "path" <*>
+  v .: "path_with_namespace" <*>
+  v .: "old_path_with_namespace" <*>
+  v .: "project_id" <*>
+  v .: "project_visibility"
+
+parseUserCreated :: Object -> Parser SystemHook
+parseUserCreated v = UserCreated <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "email" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "username" <*>
+  v .: "user_id"
+
+parseUserDestroyed :: Object -> Parser SystemHook
+parseUserDestroyed v = UserRemoved <$>
+  v .: "created_at" <*>
+  v .: "updated_at" <*>
+  v .: "email" <*>
+  v .: "event_name" <*>
+  v .: "name" <*>
+  v .: "username" <*>
+  v .: "user_id"
+
+parsePushEvent :: Object -> Parser SystemHook
+parsePushEvent v = PushEvent <$>
+    v .: "before" <*>
+    v .: "after" <*>
+    v .: "ref" <*>
+    v .: "checkout_sha" <*>
+    v .: "user_id" <*>
+    v .: "user_name" <*>
+    v .: "user_email" <*>
+    v .: "user_avatar" <*>
+    v .: "project_id" <*>
+    v .: "total_commits_count" <*>
+    v .: "project" <*>
+    v .: "commits" <*>
+    v .: "repository"

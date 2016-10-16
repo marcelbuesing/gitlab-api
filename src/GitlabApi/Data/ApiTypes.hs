@@ -24,8 +24,17 @@ type ObjectAttributeIid = Int
 
 type MilestoneId = Int
 
+-- | User's name
+type Name = Text
+
 type ProjectId =  Int
 data ProjectVisibility = Private | Public | Internal
+
+instance FromJSON ProjectVisibility where
+  parseJSON (String "private") = return  Private
+  parseJSON (String "public") = return Public
+  parseJSON (String "internal") = return Internal
+
 type ProjectVisibilityLevel = Int
 
 type RepositoryVisibilityLevel = Int

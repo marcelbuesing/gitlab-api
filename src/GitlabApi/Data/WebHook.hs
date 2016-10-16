@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GitlabHooks.Data.Types where
+module GitlabApi.Data.WebHook where
 
 import qualified Data.ByteString.Char8 as B
 import Data.Aeson
@@ -11,18 +11,7 @@ import Data.Text as T
 import Network.URL (URL(..), importURL)
 import Text.Email.Validate (EmailAddress, emailAddress)
 
-
-instance FromJSON EmailAddress where
-    parseJSON (String t) = case emailAddress $ B.pack . T.unpack $ t of
-        Just a -> pure a
-        Nothing -> fail "failed to parse EmailAddress"
-    parseJSON _ = fail "EmailAddress must be a text"
-
-instance FromJSON URL where
-  parseJSON (String t) = case importURL $ T.unpack t of
-    Just a -> pure a
-    Nothing -> fail "failed to parse URL"
-  parseJSON _ = fail "URL must be a text"
+import GitlabApi.Data.ApiTypes
 
 data GitlabEvent =
   PushEvent
@@ -31,7 +20,7 @@ data GitlabEvent =
   , _pushEventAfter :: CommitRef
   , _pushEventRef :: Text
   , _pushEventCheckoutSha :: Text
-  , _pushEventUserId :: Int
+  , _pushEventUserId :: UserId
   , _pushEventUserName :: Text
   , _pushEventUserEmail :: EmailAddress
   , _pushEventUserAvatar:: Text
@@ -100,65 +89,6 @@ parsePipelineEvent v = PipelineEvent <$>
   v .: "commit" <*>
   v .: "builds"
 
-type CommitRef = Text
-type ProjectId = Int
-
-type RepositoryVisibilityLevel = Int
-
-data Project = Project
-  { _projectName :: Text
-  , _projectDescription :: Text
-  , _projectWebUrl :: URL
-  , _projectAvatarUrl :: Maybe URL
-  , _projectGitSshUrl :: URL
-  , _projectGitHttpUrl :: URL
-  , _projectNamespace :: Text
-  , _projectVisibilitylevel :: Int
-  , _projectPathWithNamespace :: Text
-  , _projectDefaultBranch :: Text
-  , _projectHomepage :: URL
-  , _projectUrl :: URL
-  , _projectSshUrl :: URL
-  , _projectHttpUrl :: URL
-  } deriving Show
-
-instance FromJSON Project where
-  parseJSON (Object v) = Project <$>
-    v .: "name" <*>
-    v .: "description" <*>
-    v .: "web_url" <*>
-    v .: "avatar_url" <*>
-    v .: "git_ssh_url" <*>
-    v .: "git_http_url" <*>
-    v .: "namespace" <*>
-    v .: "visibility_level" <*>
-    v .: "path_with_namespace" <*>
-    v .: "default_branch" <*>
-    v .: "homepage" <*>
-    v .: "url" <*>
-    v .: "ssh_url" <*>
-    v .: "http_url"
-
-data PushEventRepository = PushEventRepository
-  { _pushEventRepositoryName :: Text
-  , _pushEventRepositoryUrl :: URL
-  , _pushEventRepositoryDescription :: Text
-  , _pushEventRepositoryHomepage :: URL
-  , _pushEventRepositoryGitHttpUrl :: URL
-  , _pushEventRepositoryGitSshUrl :: URL
-  , _pushEventRepositoryVisibilityLevel :: RepositoryVisibilityLevel
-  } deriving Show
-
-instance FromJSON PushEventRepository where
-  parseJSON (Object v) = PushEventRepository <$>
-    v .: "name" <*>
-    v .: "url" <*>
-    v .: "description" <*>
-    v .: "homepage" <*>
-    v .: "git_http_url" <*>
-    v .: "git_ssh_url" <*>
-    v .: "visibility_level"
-
 data IssueEventRepository = IssueEventRepository
   { _issueEventRepositoryName :: Text
   , _issueEventRepositoryUrl :: URL
@@ -172,38 +102,6 @@ instance FromJSON IssueEventRepository where
     v .: "url" <*>
     v .: "description" <*>
     v .: "homepage"
-
-data Commit = Commit
-  { _commitId :: CommitRef
-  , _commitMessage :: Text
-  , _commitTimestamp :: Text
-  , _commitUrl :: URL
-  , _commitAuthor :: CommitAuthor
-  , _commitAdded :: [Text]
-  , _commitModified :: [Text]
-  , _commitRemoved :: [Text]
-  } deriving Show
-
-instance FromJSON Commit where
-  parseJSON (Object v) = Commit <$>
-    v .: "id" <*>
-    v .: "message" <*>
-    v .: "timestamp" <*>
-    v .: "url" <*>
-    v .: "author" <*>
-    v .: "added" <*>
-    v .: "modified" <*>
-    v .: "removed"
-
-data CommitAuthor = CommitAuthor
-  { _commitAuthorName :: Text
-  , _commitAuthorEmail :: EmailAddress
-  } deriving Show
-
-instance FromJSON CommitAuthor where
-  parseJSON (Object v) = CommitAuthor <$>
-    v .: "name" <*>
-    v .: "email"
 
 data User = User
   { _userName :: Text
@@ -219,7 +117,7 @@ instance FromJSON User where
 
 data Assignee = Assignee
   { _assigneeName :: Text
-  , _assigneeUsername :: Text
+  , _assigneeUsername :: Username
   , _assigneeAvatarUrl :: URL
   } deriving Show
 
@@ -229,12 +127,8 @@ instance FromJSON Assignee where
     v .: "username" <*>
     v .: "avatar_url"
 
-type ObjectAttributeId = Int
-type AssigneeId = Int
-type AuthorId = Int
-type MilestoneId = Int
+
 type ObjectAttributeState = Text
-type ObjectAttributeIid = Int
 type ObjectAttributeAction = Text
 
 data IssueEventObjectAttribute = IssueEventObjectAttribute
@@ -278,8 +172,6 @@ type SHA = Text
 type PipelineEventStatus = Text
 type PipelineEventStage = Text
 
-type GitlabDate = Text
-
 data PipelineEventObjectAttribute = PipelineEventObjectAttribute
   { _pipelineEventObjectAttributeId :: ObjectAttributeId
   , _pipelineEventObjectAttributeRef :: ObjectAttributeRef
@@ -314,7 +206,7 @@ data PipelineEventProject = PipelineEventProject
   , _pipelineEventProjectGitSshUrl :: URL
   , _pipelineEventProjectGitHttpUrl :: URL
   , _pipelineEventProjectNamespace :: Text
-  , _pipelineEventProjectVisibilitylevel :: Int
+  , _pipelineEventProjectVisibilityLevel :: ProjectVisibilityLevel
   , _pipelineEventProjectPathWithNamespace :: Text
   , _pipelineEventProjectDefaultBranch :: Text
   } deriving Show
@@ -348,7 +240,6 @@ instance FromJSON PipelineEventCommit where
     v .: "url" <*>
     v .: "author"
 
-type BuildId = Int
 type BuildStage = Text
 type BuildRunner = Text
 type BuildStatus = Text
@@ -382,9 +273,6 @@ instance FromJSON Build where
     v .: "user" <*>
     v .: "runner" <*>
     v .: "artifacts_file"
-
-type FileName = Text
-type FileSize = Int
 
 data BuildArtifactsFile = BuildArtifactsFile
   { _buildArtifactsFileFileName :: Maybe FileName

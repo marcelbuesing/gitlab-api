@@ -19,8 +19,8 @@ library
   exposed-modules:     GitlabApi
                      , GitlabApi.Data
                      , GitlabApi.Data.ApiTypes
-                     , GitlabApi.Data.SystemHook
-                     , GitlabApi.Data.WebHook
+                     , GitlabApi.Data.SystemHooks
+                     , GitlabApi.Data.WebHooks
   -- other-extensions:
   build-depends:       aeson >= 0.11
                      , base >=4.9 && <4.10

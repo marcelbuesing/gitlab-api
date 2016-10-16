@@ -1,6 +1,6 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module GitlabApi.Data.WebHook where
+module GitlabApi.Data.WebHooks where
 
 import qualified Data.ByteString.Char8 as B
 import Data.Aeson

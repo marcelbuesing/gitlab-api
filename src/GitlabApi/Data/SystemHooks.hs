@@ -1,4 +1,4 @@
-module GitlabApi.Data.SystemHook where
+module GitlabApi.Data.SystemHooks where
 
 import Data.Text as T
 import Text.Email.Validate (EmailAddress, emailAddress)

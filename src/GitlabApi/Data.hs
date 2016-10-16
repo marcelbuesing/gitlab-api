@@ -1,6 +1,6 @@
 module GitlabApi.Data (
-  module GitlabApi.Data.WebHook
+  module GitlabApi.Data.WebHooks
   ) where
 
-import GitlabApi.Data.WebHook
+import GitlabApi.Data.WebHooks
 

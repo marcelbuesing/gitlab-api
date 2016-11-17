@@ -28,7 +28,7 @@ type MilestoneId = Int
 type Name = Text
 
 type ProjectId =  Int
-data ProjectVisibility = Private | Public | Internal
+data ProjectVisibility = Private | Public | Internal deriving Show
 
 instance FromJSON ProjectVisibility where
   parseJSON (String "private") = return  Private

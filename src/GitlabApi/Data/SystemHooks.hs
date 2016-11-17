@@ -95,7 +95,7 @@ data SystemHook =
   , _shPushEventProject :: Project
   , _shPushEventCommits :: [Commit]
   , _shPushEventRepository :: PushEventRepository
-  }
+  } deriving Show
 
 instance FromJSON SystemHook where
   parseJSON (Object v) = case HML.lookup "event_name" v of

@@ -15,6 +15,7 @@ type GitlabDate = Text
 
 type BuildId = Int
 type CommitRef = Text
+type CommitRefShort = Text
 
 type FileName = Text
 type FileSize = Int

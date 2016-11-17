@@ -19,6 +19,7 @@ library
   exposed-modules:     GitlabApi
                      , GitlabApi.Data
                      , GitlabApi.Data.ApiTypes
+                     , GitlabApi.Data.Commits
                      , GitlabApi.Data.SystemHooks
                      , GitlabApi.Data.WebHooks
   -- other-extensions:

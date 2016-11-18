@@ -22,7 +22,7 @@ data CommitSingle = CommitSingle
   , _commitSingleAuthoredDate :: GitlabDate
   , _commitSingleParentIds :: [CommitRef]
   , _commitSingleStats :: CommitStats
-  , _commitSingleStatus :: Text -- TODO proper type
+  , _commitSingleStatus :: Maybe Text -- TODO proper type
   }
 
 instance FromJSON CommitSingle where

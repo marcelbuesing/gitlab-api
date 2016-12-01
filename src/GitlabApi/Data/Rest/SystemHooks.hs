@@ -1,10 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell   #-}
 
-module GitlabApi.Data.Rest.SystemHooks (
-    NewSystemHookItem(..)
-  , SystemHookItem(..)
-  ) where
+module GitlabApi.Data.Rest.SystemHooks where
 
+import Control.Lens.TH (makeLenses)
 import Data.Aeson
 import Data.Text as T
 import Network.URL (URL(..), exportURL, importURL)
@@ -27,6 +26,8 @@ data SystemHookItem = SystemHookItem
   , _systemHookItemEnableSSLVerification :: Bool
   }
 
+makeLenses ''SystemHookItem
+
 instance FromJSON SystemHookItem where
   parseJSON (Object v) = SystemHookItem <$>
     v .: "id" <*>
@@ -43,6 +44,8 @@ data NewSystemHookItem = NewSystemHookItem
   , _newSystemHookItemTagPushEvents :: Bool
   , _newSystemHookItemEnableSSLVerification :: Bool
   }
+
+makeLenses ''NewSystemHookItem
 
 instance ToJSON NewSystemHookItem where
   toJSON (NewSystemHookItem u t pe tpe esv) =

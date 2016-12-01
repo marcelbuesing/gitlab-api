@@ -29,6 +29,7 @@ library
                      , bytestring >= 0.10
                      , email-validate >= 2.2
                      , http-types >= 0.9
+                     , lens >= 4.14
                      , url >= 2.1
                      , text >= 1.2
                      , transformers >= 0.5

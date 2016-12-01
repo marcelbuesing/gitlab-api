@@ -22,6 +22,7 @@ library
                      , GitlabApi.Data.Commits
                      , GitlabApi.Data.SystemHooks
                      , GitlabApi.Data.WebHooks
+                     , GitlabApi.Data.Rest.SystemHooks
   -- other-extensions:
   build-depends:       aeson >= 0.11
                      , base >=4.9 && <4.10

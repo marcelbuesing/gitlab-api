@@ -4,8 +4,10 @@ module GitlabApi.Data.ApiTypes where
 
 import Data.Aeson
 import qualified Data.ByteString.Char8 as B
+import Data.Maybe(fromJust)
+import Data.Monoid((<>))
 import Data.Text as T
-import Network.URL (URL(..), importURL)
+import Network.URL (URL(..), exportURL, importURL)
 import Text.Email.Validate (EmailAddress, emailAddress)
 
 type AuthorId = Int
@@ -30,6 +32,9 @@ type Name = Text
 
 type ProjectId =  Int
 data ProjectVisibility = Private | Public | Internal deriving Show
+type ProjectKey = Text
+
+type GroupsId = Int
 
 instance FromJSON ProjectVisibility where
   parseJSON (String "private") = return  Private
@@ -140,3 +145,19 @@ instance FromJSON Project where
     v .: "url" <*>
     v .: "ssh_url" <*>
     v .: "http_url"
+
+-- | You can use a personal access token to authenticate with the API by passing it
+-- | in either the private_token parameter or the Private-Token header.
+newtype PrivateToken = PrivateToken { _unToken :: T.Text } deriving Show
+
+data GitlabInstance = GitlabInstance
+  {
+    -- | example https://gitlab.example.com
+    _gitlabInstanceUrl :: URL
+    -- | example 9koXpg98eAheJpvBs5tK
+  , _gitlabInstancePrivateToken :: PrivateToken
+  } deriving Show
+
+-- smart constructor
+gitlabInstance :: URL -> PrivateToken -> GitlabInstance
+gitlabInstance url token = GitlabInstance (fromJust (importURL ((exportURL url) <> "api/v4"))) token

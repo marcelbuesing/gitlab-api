@@ -26,6 +26,7 @@ library
                      , GitlabApi.Data.Rest.SystemHooks
                      , GitlabApi.Data.Services
                      , GitlabApi.Req
+                     , GitlabApi.Req.Common
                      , GitlabApi.Req.Groups
                      , GitlabApi.Req.Services
   -- other-extensions:

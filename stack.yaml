@@ -15,7 +15,7 @@
 # resolver:
 #  name: custom-snapshot
 #  location: "./custom-snapshot.yaml"
-resolver: lts-7.2
+resolver: lts-8.4
 
 # User packages to be built.
 # Various formats can be used as shown in the example below.
@@ -39,7 +39,10 @@ packages:
 - '.'
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps: [
+  "cabal-doctest-1.0.6@sha256:c0b4a5b1ff38d2867e7003b4be59f3bd7e8e204ab8c988d96d3a77472ae671cd",
+  "wreq-0.5.2.1@sha256:264a7ae6fca05c5457a65fb32a78bfdc40ec056ad61e5e122d692f8b18c016f8"
+]
 
 # Override default flag values for local packages and extra-deps
 flags: {}

@@ -12,8 +12,8 @@ import GitlabApi.Data.ApiTypes
 
 data ListGroupProject = ListGroupProject {
     _listGroupProjectId :: GroupsId
-  , _listGroupProjectDescription :: Text
-  , _listGroupProjectDefaultBranch :: Text
+  , _listGroupProjectDescription :: Maybe Text
+  , _listGroupProjectDefaultBranch :: Maybe Text
   , _listGroupProjectTagList :: [Text]
   , _listGroupProjectArchived :: Bool
   , _listGroupProjectVisibility :: Text
@@ -39,7 +39,6 @@ data ListGroupProject = ListGroupProject {
   , _listGroupProjectForksCount :: Int
   , _listGroupProjectOpenIssuesCount ::  Int
   , _listGroupProjectPublicJobs :: Bool
-  , _listGroupProjectSharedWithGroups :: [Text]
   , _listGroupProjectRequestAccessEnabled :: Bool
 } deriving Show
 
@@ -74,5 +73,4 @@ instance FromJSON ListGroupProject where
         v .: "forks_count" <*>
         v .: "open_issues_count" <*>
         v .: "public_jobs" <*>
-        v .: "shared_with_groups" <*>
         v .: "request_access_enabled"

@@ -3,7 +3,8 @@
 
 module GitlabApi.Data.Groups (
     ListGroupProject(..),
-    Namespace(..)
+    Namespace(..),
+    SharedWithGroup(..)
   ) where
 
 import Control.Lens.TH (makeLenses)
@@ -27,6 +28,19 @@ instance FromJSON Namespace where
       v .: "path" <*>
       v .: "kind"
 
+data SharedWithGroup = SharedWithGroup {
+    _sharedWithGroupId :: GroupsId
+  , _sharedWithGroupGroupName :: Text
+  , _sharedWithGroupGroupAccessLevel :: Int
+  , _sharedWithGroupExpiresAt :: Maybe Text
+} deriving Show
+
+instance FromJSON SharedWithGroup where
+  parseJSON (Object v) = SharedWithGroup <$>
+      v .: "group_id" <*>
+      v .: "group_name" <*>
+      v .: "group_access_level" <*>
+      v .: "expires_at"
 
 data ListGroupProject = ListGroupProject {
     _listGroupProjectId :: GroupsId
@@ -57,6 +71,7 @@ data ListGroupProject = ListGroupProject {
   , _listGroupProjectForksCount :: Int
   , _listGroupProjectOpenIssuesCount ::  Int
   , _listGroupProjectPublicJobs :: Bool
+  , _listGroupProjectSharedWithGroups :: [SharedWithGroup]
   , _listGroupProjectRequestAccessEnabled :: Bool
 } deriving Show
 
@@ -92,4 +107,5 @@ instance FromJSON ListGroupProject where
         v .: "forks_count" <*>
         v .: "open_issues_count" <*>
         v .: "public_jobs" <*>
+        v .: "shared_with_groups" <*>
         v .: "request_access_enabled"

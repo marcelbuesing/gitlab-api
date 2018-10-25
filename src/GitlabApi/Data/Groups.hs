@@ -2,13 +2,31 @@
 {-# LANGUAGE TemplateHaskell   #-}
 
 module GitlabApi.Data.Groups (
-    ListGroupProject(..)
+    ListGroupProject(..),
+    Namespace(..)
   ) where
 
 import Control.Lens.TH (makeLenses)
 import Data.Aeson
 import Data.Text as T
 import GitlabApi.Data.ApiTypes
+
+data Namespace = Namespace {
+    _namespaceId :: Int
+  , _namespaceName :: Text
+  , _namespacePath :: Text
+  , _namespaceKind :: Text
+} deriving Show
+
+makeLenses ''Namespace
+
+instance FromJSON Namespace where
+  parseJSON (Object v) = Namespace <$>
+      v .: "id" <*>
+      v .: "name" <*>
+      v .: "path" <*>
+      v .: "kind"
+
 
 data ListGroupProject = ListGroupProject {
     _listGroupProjectId :: GroupsId
@@ -33,7 +51,7 @@ data ListGroupProject = ListGroupProject {
   , _listGroupProjectLastActivityAt :: Text
   , _listGroupProjectSharedRunnersEnabled :: Bool
   , _listGroupProjectCreatorId :: Int
-  -- listGroupProjectNamespace ::
+  , _listGroupProjectNamespace :: Namespace
   , _listGroupProjectAvatarUrl :: Maybe Text
   , _listGroupProjectStarCount :: Int
   , _listGroupProjectForksCount :: Int
@@ -68,6 +86,7 @@ instance FromJSON ListGroupProject where
         v .: "last_activity_at" <*>
         v .: "shared_runners_enabled" <*>
         v .: "creator_id" <*>
+        v .: "namespace" <*>
         v .: "avatar_url" <*>
         v .: "star_count" <*>
         v .: "forks_count" <*>
